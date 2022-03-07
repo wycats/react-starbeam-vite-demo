@@ -4,21 +4,27 @@
   "type": "module",
   "version": "0.0.0",
   "scripts": {
+    "start": "vite",
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview"
   },
   "dependencies": {
-    "react": "rc",
-    "react-dom": "rc",
-    "starbeam": "link:../../starbeam",
-    "@starbeam/react": "link:../../starbeam/@starbeam/react"
+    "@starbeam/config": "link:../library/@starbeam/config",
+    "@starbeam/core": "link:../library/@starbeam/core",
+    "@starbeam/debug": "link:../library/@starbeam/debug",
+    "@starbeam/fundamental": "link:../library/@starbeam/fundamental",
+    "@starbeam/react": "link:../library/@starbeam/react",
+    "@starbeam/reactive": "link:../library/@starbeam/reactive",
+    "@starbeam/verify": "link:../library/@starbeam/verify",
+    "react": "^18.0.0-rc.1",
+    "react-dom": "^18.0.0-rc.1"
   },
   "devDependencies": {
-    "@types/react": "^17.0.33",
-    "@types/react-dom": "^17.0.10",
+    "@types/react": "^17.0.39",
+    "@types/react-dom": "^17.0.13",
     "@vitejs/plugin-react": "latest",
-    "typescript": "next",
+    "typescript": "insiders",
     "vite": "^2.8.0"
   }
 }

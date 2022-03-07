@@ -1,90 +1,55 @@
-import { useAtom, useReactive } from "@starbeam/react";
-import { is, memo, reactive, verify } from "starbeam";
+import { reactive } from "@starbeam/core";
+import { useReactive } from "@starbeam/react";
+import { Cell } from "@starbeam/reactive";
 import "./App.css";
-import logo from "./logo.svg";
+import { Equation } from "./counter/starbeam-counter";
+import { tables } from "./database/db";
+import Log from "./lib/Log";
+import { UserForm } from "./user/UserForm";
+import UserList from "./user/UserList";
+// import Users from "./user/Users";
 
-interface User {
-  name: string;
-  country: string;
-}
-
-class Users {
-  readonly #values: Map<string, User> = reactive(Map);
-
-  insert(id: string, user: User): Readonly<User> {
-    let row = reactive(user);
-    this.#values.set(id, row);
-    return row;
-  }
-
-  update(id: string, updates: Partial<User>): void {
-    let user = this.#values.get(id);
-
-    verify(user, is.Present);
-
-    for (let [key, value] of Object.entries(updates)) {
-      user[key as keyof User] = value;
-    }
-  }
-
-  get all(): IterableIterator<User> {
-    return this.#values.values();
-  }
-}
+const Users = tables.users;
+Users.insert({ id: "1", name: "Tom Dale", country: "United States" });
+Users.insert({ id: "2", name: "Yehuda Katz", country: "United States" });
 
 function App() {
-  const count = useAtom(0);
+  return useReactive(() => {
+    const count = Cell(0);
 
-  const users = new Users();
+    function addUser() {
+      Users.insert({ id: "3", name: "Chirag Patel", country: "United States" });
+    }
 
-  users.insert("1", { name: "Tom Dale", country: "United States" });
-  users.insert("2", { name: "Yehuda Katz", country: "United States" });
+    const users = reactive(() => [...Users.all]);
+    const names = reactive(() =>
+      users.current.map((user) => user.columns.name).join(", ")
+    );
 
-  function addUser() {
-    users.insert("3", { name: "Chirag Patel", country: "United States" });
-  }
+    return () => {
+      return (
+        <div className="App">
+          <header className="App-header">
+            <p>List of users: {names.current}</p>
 
-  const names = useReactive(
-    memo(() => [...users.all].map((user) => user.name))
-  ).join(", ");
+            <Log key="users" info={users} />
+            <UserList users={users} />
 
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>Hello Vite + React!</p>
-        <p>{names}</p>
-        <button onClick={addUser}>Add a user</button>
-        <p>
-          <button type="button" onClick={() => count.update(count.current + 1)}>
-            count is: {count.current}
-          </button>
-        </p>
-        <p>
-          Edit <code>App.tsx</code> and save to test HMR updates.
-        </p>
-        <p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-          {" | "}
-          <a
-            className="App-link"
-            href="https://vitejs.dev/guide/features.html"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Vite Docs
-          </a>
-        </p>
-      </header>
-    </div>
-  );
+            <button onClick={addUser}>Add a user</button>
+
+            <h2>Equation</h2>
+            <Equation />
+
+            {/* <h2>Starbeam Counter</h2>
+            <StarbeamCounter />
+  
+            <h2>React Counter</h2>
+            <ReactCounter /> */}
+          </header>
+        </div>
+      );
+    };
+  }, {});
 }
 
 export default App;
